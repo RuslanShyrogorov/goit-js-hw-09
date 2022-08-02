@@ -32,12 +32,15 @@ const options = {
   },
 };
 
-const timer = flatpickr("#datetime-picker", options);
+const date = flatpickr("#datetime-picker", options);
 
-const timerOn = {
-  intervalId: null,
-  isActive: false,
-  // deltaTime: null,
+class Timer {
+  constructor ({ onTick }) {
+    this.intervalId = null;
+    this.isActive = false;
+    this.onTick = onTick;
+  }
+  
 
   start() {
     if (this.isActive) {
@@ -45,15 +48,20 @@ const timerOn = {
     }
 
     this.isActive = true
+    const finishTime = date.selectedDates[0]
 
     this.intervalId = setInterval(() => {
-      deltaTime = timer.selectedDates[0] - Date.now()
-      const { days, hours, minutes, seconds } = convertMs(deltaTime)
+      const deltaTime = finishTime - Date.now()
+      const time = convertMs(deltaTime)
+      this.onTick(time)
+
+
 
       if (deltaTime <= 0) {
       clearInterval(this.intervalID);
-      const { days, hours, minutes, seconds } = convertMs(0);
-      this.isActive = false
+        const endTime = convertMs(0);
+        this.onTick(endTime)
+        this.isActive = false
     }
       
     }, DELAY_INTERVAL)
@@ -64,10 +72,14 @@ const timerOn = {
   }
 }
 
+const timer = new Timer({
+  onTick: updateClockFace,
+})
+
 refs.startBtn.addEventListener('click', startTimer)
 
 function startTimer() {
-  timerOn.start()
+  timer.start()
 }
 
 
@@ -77,21 +89,6 @@ function updateClockFace({ days, hours, minutes, seconds }) {
   refs.minutes.textContent = minutes
   refs.seconds.textContent = seconds
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 function pad(value) {
   return String(value).padStart(2, '0')
