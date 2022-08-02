@@ -55,15 +55,12 @@ class Timer {
       const time = convertMs(deltaTime)
       this.onTick(time)
 
-
-
       if (deltaTime <= 0) {
       clearInterval(this.intervalID);
         const endTime = convertMs(0);
         this.onTick(endTime)
         this.isActive = false
     }
-      
     }, DELAY_INTERVAL)
 
     refs.startBtn.setAttribute('disabled', 'disabled')
